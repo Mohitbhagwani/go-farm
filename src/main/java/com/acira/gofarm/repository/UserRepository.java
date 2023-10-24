@@ -8,11 +8,8 @@ import java.util.Optional;
 
 
 public interface UserRepository extends JpaRepository<User, String> {
+    User findByContactNumberAndDeletedAtIsNull(Long contactNumber);
 
-    Optional<User> findByEmailIgnoreCase(String email);
-
-
-    User findByContactNumber(Long contactNumber);
-
+    Optional<User> findByIdAndDeletedAtIsNull(String contactNumber);
 
 }

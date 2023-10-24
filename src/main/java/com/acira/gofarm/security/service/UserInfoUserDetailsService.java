@@ -20,7 +20,7 @@ public class UserInfoUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userInfo = Optional.ofNullable(repository.findByContactNumber(Long.parseLong(username)));
+        Optional<User> userInfo = Optional.ofNullable(repository.findByContactNumberAndDeletedAtIsNull(Long.parseLong(username)));
         return userInfo.map(UserInfoUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("user not found " + username));
 

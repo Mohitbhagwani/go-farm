@@ -19,14 +19,14 @@ public class Address {
     private String address1;
     private String address2;
 
-
-    private String taluk;
-    private String district;
     private String city;
     private String state;
     private Integer postalCode;
 
     private String addressType;
+    @ManyToOne
+    @JoinColumn(name = "master_taluk_detail_id")
+    private MasterTalukDetail masterTalukDetail;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

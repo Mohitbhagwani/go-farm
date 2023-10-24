@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -40,7 +41,7 @@ public class UserService {
 
 
     public User getUserByContactNumber(Long contactNumber) {
-        return userRepository.findByContactNumber(contactNumber);
+        return userRepository.findByContactNumberAndDeletedAtIsNull(contactNumber);
     }
 
     public Map<String, Object> authenticate(AuthRequest authRequest) {
@@ -55,7 +56,7 @@ public class UserService {
             user.setStatus(Status.INACTIVE);
             userRepository.save(user);
         }
-        if (user.getStatus()!=null && user.getStatus().equals(Status.ACTIVE)) {
+        if (user.getStatus() != null && user.getStatus().equals(Status.ACTIVE)) {
             userMap.put("status", Status.ACTIVE);
             userMap.put("contactNumber", authRequest.getContactNumber());
             userMap.put("id", user.getId());
@@ -75,7 +76,7 @@ public class UserService {
     @Transactional
     public UserRegistrationDTO registerUser(UserRegistrationDTO userRegistrationDTO) {
         Claims claims = jwtService.userData();
-        User user = userRepository.findById(claims.get("id").toString()).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("User not found with %s", claims.get("id").toString())));
+        User user = userRepository.findByIdAndDeletedAtIsNull(claims.get("id").toString()).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("User not found with %s", claims.get("id").toString())));
         if (user.getStatus().equals(Status.ACTIVE)) {
             throw new CustomException(HttpStatus.CONFLICT.value(), String.format("User with contact number %s is already enabled", user.getContactNumber().toString()));
         }
@@ -85,7 +86,31 @@ public class UserService {
         user.setRoles(userDTO.getRole());
         user.setStatus(Status.ACTIVE); // You can set the initial enabled status
 
+        var preference = userRegistrationDTO.getPreference();
+
+        if (userRegistrationDTO.getPreference() != null) {
+            if (userDTO.getRole().equalsIgnoreCase("buyer") && (preference.getPreferredLocation() == null || preference.getPreferredLocation().isEmpty())) {
+                throw new CustomException(HttpStatus.BAD_REQUEST.value(), String.format("kindly add %s preferred location.", userDTO.getRole()));
+            }
+            if (userDTO.getRole().equalsIgnoreCase("buyer") && (preference.getCrops() == null || preference.getCrops().isEmpty())) {
+                throw new CustomException(HttpStatus.BAD_REQUEST.value(), String.format("kindly add %s preferred location.", userDTO.getRole()));
+            }
+            if (userDTO.getRole().equalsIgnoreCase("fpo") && (preference.getCrops() == null || preference.getCrops().isEmpty())) {
+                throw new CustomException(HttpStatus.BAD_REQUEST.value(), String.format("kindly add %s preferred location.", userDTO.getRole()));
+            }
+        } else {
+            throw new CustomException(HttpStatus.BAD_REQUEST.value(), String.format("kindly add %s preference", userDTO.getRole()));
+        }
+
         UserInfo userInfo = new UserInfo();
+        if (userDTO.getRole().equalsIgnoreCase("fpo")) {
+            userInfo.setFarmerMajorCrops(preference.getCrops().stream().map(String::valueOf).collect(Collectors.joining(",")));
+            userRegistrationDTO.getPreference().setPreferredLocation(null);
+        }
+        if (userDTO.getRole().equalsIgnoreCase("buyer")) {
+            userInfo.setBuyerPreferredCrops(preference.getCrops().stream().map(String::valueOf).collect(Collectors.joining(",")));
+            userInfo.setBuyerPreferredLocations(preference.getPreferredLocation().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
         userInfo.setId(user.getId());
         userInfo.setFirstName(userDTO.getFirstName());
         userInfo.setLastName(userDTO.getLastName());
@@ -102,8 +127,6 @@ public class UserService {
         address.setId(UUID.randomUUID().toString());
         address.setAddress1(addressDTO.getAddress1());
         address.setAddress2(addressDTO.getAddress2());
-        address.setDistrict(addressDTO.getDistrict());
-        address.setTaluk(addressDTO.getTaluk());
         address.setCity(addressDTO.getCity());
         address.setState(addressDTO.getState());
         address.setPostalCode(addressDTO.getPostalCode());

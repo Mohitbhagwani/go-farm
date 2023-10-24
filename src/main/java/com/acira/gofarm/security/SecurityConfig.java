@@ -53,7 +53,7 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/users/new", "/users/authenticate").permitAll()
-                            .requestMatchers("/api/media/**","/v1/masters/**","/users/**").authenticated();
+                            .requestMatchers("/api/media/**","/users/**","/v1/**").authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
