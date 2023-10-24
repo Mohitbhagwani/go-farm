@@ -50,6 +50,8 @@ public class UserInfo {
 //    private List<String> buyerPreferredLocationList;
 
     private String buyerPreferredCrops;
+
+    private Long totalShareMembers;
 //
 //    @Transient
 //    private List<String> buyerPreferredCropList;

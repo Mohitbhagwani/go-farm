@@ -104,6 +104,11 @@ public class UserService {
 
         UserInfo userInfo = new UserInfo();
         if (userDTO.getRole().equalsIgnoreCase("fpo")) {
+            if (userDTO.getTotalShareMembers() == null) {
+                throw new CustomException(HttpStatus.BAD_REQUEST.value(), "kindly enter total share members.");
+            } else {
+                userInfo.setTotalShareMembers(userDTO.getTotalShareMembers());
+            }
             userInfo.setFarmerMajorCrops(preference.getCrops().stream().map(String::valueOf).collect(Collectors.joining(",")));
             userRegistrationDTO.getPreference().setPreferredLocation(null);
         }

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +39,7 @@ public class CropDetailService {
     CropRepository cropRepository;
 
 
-    ModelMapper modelMapper= new ModelMapper();
+    ModelMapper modelMapper = new ModelMapper();
 
     public CropDTO addCropDetail(CropDTO cropDTO) {
         Claims claims = jwtService.userData();
@@ -113,7 +114,7 @@ public class CropDetailService {
     }
 
     public List<CropDTO> getCropDetailByUserId(UUID userId) {
-        User user = userRepository.findByIdAndDeletedAtIsNull(String.valueOf(userId)).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("User not found with %s",userId.toString())));
+        User user = userRepository.findByIdAndDeletedAtIsNull(String.valueOf(userId)).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("User not found with %s", userId.toString())));
         List<Crop> cropList = cropRepository.findByUserAndDeletedAtNull(user.getUserInfo());
         return cropList.stream()
                 .map(crop -> modelMapper.map(crop, CropDTO.class))
@@ -121,6 +122,15 @@ public class CropDetailService {
     }
 
     public CropDTO getCropDetailByCropDetailId(UUID cropDetailId) {
-    return modelMapper.map(cropRepository.findByIdAndDeletedAtNull(cropDetailId.toString()), CropDTO.class);
+        Crop crop = cropRepository.findByIdAndDeletedAtNull(cropDetailId.toString())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("Crop detail not found with ID %s", cropDetailId)));
+        return modelMapper.map(crop, CropDTO.class);
+    }
+
+    public void deleteCropDetailByCropDetailId(UUID cropDetailId) {
+        Crop crop = cropRepository.findByIdAndDeletedAtNull(cropDetailId.toString())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("Crop detail not found with ID %s", cropDetailId)));
+        crop.setDeletedAt(LocalDateTime.now());
+        cropRepository.save(crop);
     }
 }

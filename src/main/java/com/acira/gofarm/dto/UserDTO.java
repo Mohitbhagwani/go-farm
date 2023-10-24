@@ -27,5 +27,6 @@ public class UserDTO {
     @NotBlank(message = "role cannot be left null, empty or blank")
     private String role;
     private Long AlternateContactNumber;
+    private Long totalShareMembers;
 
 }

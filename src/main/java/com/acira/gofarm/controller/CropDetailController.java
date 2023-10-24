@@ -44,6 +44,16 @@ public class CropDetailController {
     public ResponseEntity<Object> getCropDetailByUserId(@PathVariable UUID userId) {
         List<CropDTO> crop = cropDetailService.getCropDetailByUserId(userId);
         return new ResponseEntity<>(crop, HttpStatus.OK);
+    }
 
+    @GetMapping("user/{cropDetailId}")
+    public ResponseEntity<Object> getCropDetailByCropDetailId(@PathVariable UUID cropDetailId) {
+        return new ResponseEntity<>(cropDetailService.getCropDetailByCropDetailId(cropDetailId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("user/{cropDetailId}")
+    public ResponseEntity<Void> deleteCropDetailByCropDetailId(@PathVariable UUID cropDetailId) {
+        cropDetailService.deleteCropDetailByCropDetailId(cropDetailId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

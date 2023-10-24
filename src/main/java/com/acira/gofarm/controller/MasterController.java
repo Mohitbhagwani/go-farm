@@ -21,7 +21,6 @@ public class MasterController {
     MasterCropDetailRepository masterCropDetailRepository;
 
     @GetMapping("talukas")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<MasterTalukDetail> getAllTalukasDetails(){
         return masterTalukDetailRepository.findAll();
     }

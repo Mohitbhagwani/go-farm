@@ -10,7 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -28,8 +28,8 @@ public class Crop {
     private String otherVariety;
 
     private String cropDescription;
-    private Timestamp plantingDate;
-    private Timestamp harvestDate;
+    private LocalDateTime plantingDate;
+    private LocalDateTime harvestDate;
     private String cropLocation;
     private BigDecimal quantityHarvested;
     private String cropCondition;
@@ -61,11 +61,11 @@ public class Crop {
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(nullable = false)
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 
-    private Timestamp deletedAt;
+    private LocalDateTime deletedAt;
 }
