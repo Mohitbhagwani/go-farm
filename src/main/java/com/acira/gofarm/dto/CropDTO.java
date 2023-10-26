@@ -1,6 +1,7 @@
 package com.acira.gofarm.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -21,4 +22,6 @@ public class CropDTO {
     private UUID masterCropId;
     private BigDecimal price;
     private String uom;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String mediaId;
 }

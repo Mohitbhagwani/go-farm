@@ -71,7 +71,15 @@ public class CropDetailService {
 
         crop.setMasterCrop(masterCropDetail.get());
         crop.setPrice(cropDTO.getPrice());
-        crop.setUom(crop.getUom());
+        if (masterCropDetail.get().getUomList().stream()
+                .map(String::toLowerCase) // Convert all elements to lowercase
+                .anyMatch(uom -> uom.equals(cropDTO.getUom()))) {
+            // uom exists in the uomList
+            crop.setUom(cropDTO.getUom());
+        }else {
+            throw new CustomException(HttpStatus.BAD_REQUEST.value(), String.format("invalid uom present for crop master id %s",masterCropDetail.get().getId()));
+        }
+
         crop.setUser(user.getUserInfo());
         // Save the new Crop entity to the database
         cropRepository.save(crop);
@@ -97,6 +105,16 @@ public class CropDetailService {
 
             masterCropDetail = Optional.ofNullable(masterCropDetailRepository.findByIdAndDeletedAtIsNull(cropDTO.getMasterCropId().toString()).orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST.value(), "Invalid master crop id entered.")));
         }
+
+        if (masterCropDetail.get().getUomList().stream()
+                .map(String::toLowerCase) // Convert all elements to lowercase
+                .anyMatch(uom -> uom.equals(cropDTO.getUom()))) {
+            // uom exists in the uomList
+            crop.setUom(cropDTO.getUom());
+        }else {
+            throw new CustomException(HttpStatus.BAD_REQUEST.value(), String.format("invalid uom present for crop master id %s",masterCropDetail.get().getId()));
+        }
+
         crop.setVariety(cropDTO.getVariety());
         crop.setOtherVariety(cropDTO.getOtherVariety());
         crop.setQuantityHarvested(cropDTO.getQuantity());

@@ -46,7 +46,7 @@ public class CropDetailController {
         return new ResponseEntity<>(crop, HttpStatus.OK);
     }
 
-    @GetMapping("user/{cropDetailId}")
+    @GetMapping("crop/{cropDetailId}")
     public ResponseEntity<Object> getCropDetailByCropDetailId(@PathVariable UUID cropDetailId) {
         return new ResponseEntity<>(cropDetailService.getCropDetailByCropDetailId(cropDetailId), HttpStatus.OK);
     }
