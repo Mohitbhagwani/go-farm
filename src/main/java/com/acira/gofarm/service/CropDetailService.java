@@ -87,7 +87,7 @@ public class CropDetailService {
         }
         Optional<MasterCropDetail> masterCropDetail = Optional.of(new MasterCropDetail());
 
-        Crop crop = cropRepository.findByIdAndDeletedAtNull(cropId.toString()).orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST.value(), "Invalid crop id entered"));
+        Crop crop = cropRepository.findByIdAndDeletedAtIsNull(cropId.toString()).orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST.value(), "Invalid crop id entered"));
         if (cropDTO.getVariety().equalsIgnoreCase("others") && cropDTO.getOtherVariety() == null) {
             throw new CustomException(HttpStatus.BAD_REQUEST.value(), "Kindly enter valid value for the field Other variety.");
         }
@@ -122,13 +122,13 @@ public class CropDetailService {
     }
 
     public CropDTO getCropDetailByCropDetailId(UUID cropDetailId) {
-        Crop crop = cropRepository.findByIdAndDeletedAtNull(cropDetailId.toString())
+        Crop crop = cropRepository.findByIdAndDeletedAtIsNull(cropDetailId.toString())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("Crop detail not found with ID %s", cropDetailId)));
         return modelMapper.map(crop, CropDTO.class);
     }
 
     public void deleteCropDetailByCropDetailId(UUID cropDetailId) {
-        Crop crop = cropRepository.findByIdAndDeletedAtNull(cropDetailId.toString())
+        Crop crop = cropRepository.findByIdAndDeletedAtIsNull(cropDetailId.toString())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND.value(), String.format("Crop detail not found with ID %s", cropDetailId)));
         crop.setDeletedAt(LocalDateTime.now());
         cropRepository.save(crop);

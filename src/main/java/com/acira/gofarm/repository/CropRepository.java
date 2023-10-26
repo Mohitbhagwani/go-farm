@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface CropRepository extends JpaRepository<Crop, String> {
-    Optional<Crop> findByIdAndDeletedAtNull(String id);
+    Optional<Crop> findByIdAndDeletedAtIsNull(String id);
     List<Crop> findByUserAndDeletedAtNull(UserInfo user);
 }
